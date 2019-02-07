@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Capimichi_CreareSeoImproved>
+            <version>0.0.1</version>
+        </Capimichi_CreareSeoImproved>
+    </modules>
+    <global>
+        <helpers>
+            <creareseoimproved>
+                <class>Capimichi_CreareSeoImproved_Helper</class>
+            </creareseoimproved>
+            <creareseocore>
+                <rewrite>
+                    <meta>Capimichi_CreareSeoImproved_Helper_Meta</meta>
+                </rewrite>
+            </creareseocore>
+        </helpers>
+    </global>
+</config>

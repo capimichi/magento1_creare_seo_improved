@@ -1,0 +1,8 @@
+{
+  "name": "capimichi/magento1_creare_seo_improved",
+  "type": "magento-module",
+  "license": "OSL-3.0",
+  "require": {
+    "magento-hackathon/magento-composer-installer": "*"
+  }
+}

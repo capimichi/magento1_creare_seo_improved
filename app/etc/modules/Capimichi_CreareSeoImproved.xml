@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Capimichi_CreareSeoImproved>
+            <active>true</active>
+            <codePool>local</codePool>
+            <depends>
+                <Creare_CreareSeoCore/>
+            </depends>
+        </Capimichi_CreareSeoImproved>
+    </modules>
+</config>
