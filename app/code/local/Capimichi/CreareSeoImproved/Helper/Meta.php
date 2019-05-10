@@ -150,15 +150,34 @@ class Capimichi_CreareSeoImproved_Helper_Meta extends Creare_CreareSeoCore_Helpe
 	}
 
 	public function applyCustomAttriubte($pagetype, $string)
-	{
-		if ($pagetype->_code == "product") {
-			while (preg_match("/\[custom_attribute_(.*?)\]/is", $string, $code)) {
-				$code = $code[1];
-				$product = $pagetype->_model;
-				$string = str_replace("[custom_attribute_" . $code . "]", $product->getAttribteText($code), $string);
-			}
-		}
-
-		return $string;
-	}
+    {
+        if ($pagetype->_code == "product") {
+            while (preg_match("/\[custom_attribute_(.*?)\]/is", $string, $code)) {
+                $code = $code[1];
+                $product = $pagetype->_model;
+                
+                $attribute = Mage::getSingleton('eav/config')->getAttribute(Mage_Catalog_Model_Product::ENTITY, $code);
+                $type = $attribute->getFrontendInput();
+                $value = "";
+                switch ($type) {
+                    case "select":
+                        $optionId = $product->getData($code);
+                        if ($optionId) {
+                            $optionLabel = $attribute->getFrontend()->getOption($optionId);
+                        } else {
+                            $optionLabel = "";
+                        }
+                        $value = $optionLabel;
+                        break;
+                    case "text":
+                    case "textarea":
+                        $value = $product->getData($code);
+                        break;
+                }
+                $string = str_replace("[custom_attribute_" . $code . "]", $value, $string);
+            }
+        }
+        
+        return $string;
+    }
 }
