@@ -147,56 +147,77 @@ class Capimichi_CreareSeoImproved_Helper_Meta extends Creare_CreareSeoCore_Helpe
     public function applyParent($pagetype, $string)
     {
         if ($pagetype->_code == "category") {
-            
-            while (preg_match("/\[parent_category(.*?)\]/is", $string, $parentCategoryData)) {
-                $parentCategoryData = $parentCategoryData[1];
-                
-                $properties = [
-                    'level'          => 1,
-                    'left_separator' => '',
-                    'ignore_default' => 1,
-                ];
-                
-                foreach ($properties as $key => $value) {
-                    if (preg_match("/" . $key . "=\"(.*?)\"/is", $parentCategoryData, $v)) {
-                        $properties[$key] = $v[1];
-                    }
-                }
-                
-                $category = $pagetype->_model;
-                
-                $parent = $category;
-                $currentParentLevel = 0;
-                while ($currentParentLevel < intval($properties['level'])) {
-                    if ($parent->getParentId()) {
-                        $parent = Mage::getModel('catalog/category')->load($parent->getParentId());
-                    }
-                    $currentParentLevel++;
-                }
-                
-                if (intval($properties['ignore_default'])) {
-                    if ($parent->getPath()) {
-                        if (count(explode("/", $parent->getPath())) < 3) {
-                            $parent = null;
-                        }
-                    }
-                }
-                
-                $leftSeparator = $properties['left_separator'];
-                if (!$parent) {
-                    $leftSeparator = "";
-                }
-                
-                $replaceString = [
-                    $leftSeparator,
-                    $parent ? $parent->getName() : '',
-                ];
-                
-                $string = preg_replace("/\[parent_category.*?\]/is", $replaceString, $string, 1);
+            $category = $pagetype->_model;
+            $string = $this->replaceCategory($category, $string);
+        }
+        
+        if ($pagetype->_code == "product") {
+            $product = $pagetype->_model;
+            $categoryIds = $product->getCategoryIds();
+            if (count($categoryIds)) {
+                $categoryId = array_pop($categoryId);
+                $category = Mage::getModel('catalog/category')->load($categoryId);
+                $string = $this->replaceCategory($category, $string);
             }
         }
         
         return $string;
+    }
+    
+    /**
+     * Replace category as indicated
+     *
+     * @author Michele Capicchioni <capimichi@gmail.com>
+     *
+     * @param $category
+     * @param $string
+     */
+    protected function replaceCategory($category, $string)
+    {
+        while (preg_match("/\[parent_category(.*?)\]/is", $string, $parentCategoryData)) {
+            $parentCategoryData = $parentCategoryData[1];
+            
+            $properties = [
+                'level'          => 1,
+                'left_separator' => '',
+                'ignore_default' => 1,
+            ];
+            
+            foreach ($properties as $key => $value) {
+                if (preg_match("/" . $key . "=\"(.*?)\"/is", $parentCategoryData, $v)) {
+                    $properties[$key] = $v[1];
+                }
+            }
+            
+            $parent = $category;
+            $currentParentLevel = 0;
+            while ($currentParentLevel < intval($properties['level'])) {
+                if ($parent->getParentId()) {
+                    $parent = Mage::getModel('catalog/category')->load($parent->getParentId());
+                }
+                $currentParentLevel++;
+            }
+            
+            if (intval($properties['ignore_default'])) {
+                if ($parent->getPath()) {
+                    if (count(explode("/", $parent->getPath())) < 3) {
+                        $parent = null;
+                    }
+                }
+            }
+            
+            $leftSeparator = $properties['left_separator'];
+            if (!$parent) {
+                $leftSeparator = "";
+            }
+            
+            $replaceString = [
+                $leftSeparator,
+                $parent ? $parent->getName() : '',
+            ];
+            
+            $string = preg_replace("/\[parent_category.*?\]/is", $replaceString, $string, 1);
+        }
     }
     
     public function applyCustomAttriubte($pagetype, $string)
