@@ -155,7 +155,7 @@ class Capimichi_CreareSeoImproved_Helper_Meta extends Creare_CreareSeoCore_Helpe
             $product = $pagetype->_model;
             $categoryIds = $product->getCategoryIds();
             if (count($categoryIds)) {
-                $categoryId = array_pop($categoryId);
+                $categoryId = array_pop($categoryIds);
                 $category = Mage::getModel('catalog/category')->load($categoryId);
                 $string = $this->replaceCategory($category, $string);
             }
@@ -165,17 +165,17 @@ class Capimichi_CreareSeoImproved_Helper_Meta extends Creare_CreareSeoCore_Helpe
     }
     
     /**
-     * Replace category as indicated
-     *
      * @author Michele Capicchioni <capimichi@gmail.com>
      *
      * @param $category
      * @param $string
+     *
+     * @return null|string|string[]
      */
     protected function replaceCategory($category, $string)
     {
-        while (preg_match("/\[parent_category(.*?)\]/is", $string, $parentCategoryData)) {
-            $parentCategoryData = $parentCategoryData[1];
+        while (preg_match("/\[(parent_category|category)(.*?)\]/is", $string, $parentCategoryData)) {
+            $parentCategoryData = $parentCategoryData[2];
             
             $properties = [
                 'level'          => 1,
@@ -215,9 +215,12 @@ class Capimichi_CreareSeoImproved_Helper_Meta extends Creare_CreareSeoCore_Helpe
                 $leftSeparator,
                 $parent ? $parent->getName() : '',
             ];
+            $replaceString = implode("", $replaceString);
             
-            $string = preg_replace("/\[parent_category.*?\]/is", $replaceString, $string, 1);
+            $string = preg_replace("/\[(parent_category|category).*?\]/is", $replaceString, $string, 1);
         }
+        
+        return $string;
     }
     
     public function applyCustomAttriubte($pagetype, $string)
